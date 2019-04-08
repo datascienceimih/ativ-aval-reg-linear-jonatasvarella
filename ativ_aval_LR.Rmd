@@ -1,0 +1,419 @@
+---
+title: "Exercicio avaliativo Regressão Linear"
+author: "Jonatas Varella"
+date: "7 de abril de 2019"
+output:
+     pdf_document:
+         latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyr)
+library(tidyselect)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(descr)
+library(readr)
+library(texreg)
+```
+
+##
+
+Exercício 8
+This question involves the use of simple linear regression on the Auto
+data set. (a) Use the lm() function to perform a simple linear regression with
+mpg as the response and horsepower as the predictor. Use the
+summary() function to print the results. Comment on the output.
+
+##
+```{r, warning=FALSE, message=FALSE}
+# Carregando o Bd
+#install.packages("ISLR")
+library(ISLR)
+bd = data(Auto)
+bd = Auto
+# Estimando a regressão
+bd = na.omit(bd)
+bd$horsepower = as.numeric(bd$horsepower)  
+reg1 = lm("mpg ~ horsepower", data = bd)
+summary(reg1)
+```
+
+##
+
+i. Is there a relationship between the predictor and the response?
+
+r: Sim, há uma relação inversamente proporcional entre a potência em cavalos do veículo com o consumo de combustivel por litro/galão. Observa-se que o P-Valor é menor que 0,05 e portanto, pode-se rejeitar a hipótese nula e inferir associação entre o preditor e a variável resposta.
+
+ii. How strong is the relationship between the predictor and
+the response?
+
+r: Observando o r quadrado, podemos inferir que a variável "Horsepower" explica em média 60% da variação da variável "mpg".
+
+iii. Is the relationship between the predictor and the response
+positive or negative?
+
+r: Negativa
+
+iv. What is the predicted mpg associated with a horsepower of
+98? What are the associated 95 % confidence and prediction
+intervals?
+##
+
+```{r quetion8_iv}
+## ??
+```
+##
+
+(b) Plot the response and the predictor. Use the abline() function
+to display the least squares regression line
+
+##
+```{r question8b}
+plot(bd$horsepower, bd$mpg)
+abline(reg1)
+```
+##
+
+c) Use the plot() function to produce diagnostic plots of the least
+squares regression fit. Comment on any problems you see with
+the fit.
+
+##
+```{r question8c}
+par(mfrow=c(2,2))
+plot(reg1)
+```
+##
+
+Os gráficos do resíduos demonstram que a relação entre as varíaveis não são lineares. 
+
+##
+
+Exercício 9:
+This question involves the use of multiple linear regression on the
+Auto data set.
+a) Produce a scatterplot matrix which includes all of the variables in the data set.
+
+##
+
+```{r question9a}
+pairs(bd)
+```
+##
+
+b) Compute the matrix of correlations between the variables using the function cor(). You will need to exclude the name variable, cor() which is qualitative.
+
+##
+```{r question9b}
+names(bd)
+cor = bd %>% select(-"name")
+cor(cor)
+```
+##
+
+c) Use the lm() function to perform a multiple linear regression with mpg as the response and all other variables except name as the predictors. Use the summary() function to print the results.
+
+##
+
+```{r question9c}
+names(bd)
+reg2 = lm("mpg ~ horsepower + cylinders + displacement + weight + acceleration + year + origin ",
+          data = bd)
+summary(reg2)
+```
+##
+
+9-c) i. Is there a relationship between the predictors and the response?
+
+r: Sim. Em quatro variáveis podemos inferir significância estatistica, logo, assumir relação entre os preditores a variável resposta.
+
+9-c) ii. Which predictors appear to have a statistically significant relationship to the response?
+
+r: As variáveis year, origin, displacement e weight apresentam significância estatistica.
+
+9-c) iii. What does the coefficient for the year variable suggest?
+
+r: Em média e, considerando as outras variaveis costantes, o aumento de um ano da produção do carro aumenta em 0.75 o consumo de combustivel "mpg".
+
+##
+
+9-d) Use the plot() function to produce diagnostic plots of the linear regression fit. Comment on any problems you see with the fit. Do the residual plots suggest any unusually large outliers? Does the leverage plot identify any observations with unusually high
+leverage?
+
+##
+```{r question9d}
+par(mfrow=c(2,2))
+plot(reg2)
+```
+##
+
+O Gráfico Residuals vs Leverage sugerem que o ponto 14 é um outlier.
+
+##
+
+Exércicio 10: 
+This question should be answered using the Carseats data set:
+a) Fit a multiple regression model to predict Sales using Price, Urban, and US.
+
+##
+```{r question10a}
+data(Carseats)
+bd1 = Carseats
+names(bd1)
+reg3 = lm("Sales ~ Price + Urban + US", data=bd1)
+summary(reg3)
+
+```
+##
+
+b) Provide an interpretattion of each coefficient int the model:
+
+r: Para a variável "urban", que é uma dummy,  observamos que o resultado não é estatisticamente significiativo. Já no caso da variável "price", observamos uma relação negativa, sendo que, em média, podemos associar que o aumento do preço diminui as vendas. Para 1 unidade de "price", diminui-se, em média, 54 unidades de "sale". Por fim, a variável US é qualitativa. No caso, quando observa-se que o valor da variável US é sim, aumenta, em média, as vendas.
+
+## 
+
+c) Write out the model in equation form, being careful to handle the qualitative variables properly:
+
+r: {y} = 13.0435 + (-0.0219 Urban) + (1.2006 US) + (-0.0545  Price)
+
+##
+
+d)  For which of the predictors can you reject the null hypothesis H0 : βj = 0?
+
+Pode-se rejeitar a hipotese nula para as variáveis "US" and "Price", conforme os valores do P-VALOR.
+
+##
+
+e) On the basis of your response to the previous question, fit a smaller model that only uses the predictors for which there is evidence of association with the outcome.
+
+```{r question10e}
+reg4 = lm("Sales ~ Price + US", data=bd1)
+summary(reg4)
+```
+
+##
+
+f) How well do the models in (a) and (e) fit the data?
+
+r: Observa-se que para ambos os modelos o R quadrado é de 0.239. Nesse caso, os dois modelos aparentam estar ajustado na mesma medida. No caso do modelo estimado para a opção e) utilizou-se uma variável a menos, pode-se dizer que foi mais eficiente.
+##
+
+(g) Using the model from (e), obtain 95 % confidence intervals for the coefficient(s).
+
+```{r question10g}
+confint(reg4)
+```
+## 
+
+(h) Is there evidence of outliers or high leverage observations in the
+model from (e)?
+
+r ? 
+
+##
+Exercicio 13: 
+In this exercise you will create some simulated data and will fit simple linear regression models to it. Make sure to use set.seed(1) prior to starting part (a) to ensure consistent results.
+
+a) Using the rnorm() function, create a vector, x, containing 100 observations drawn from a N(0, 1) distribution. This represents a feature, X.
+
+```{r question13a}
+set.seed(1)
+x = rnorm(100)
+mean(x)
+sd(x)
+```
+##
+
+b) Using the rnorm() function, create a vector, eps, containing 100 observations drawn from a N(0, 0.25) distribution i.e. a normal distribution with mean zero and variance 0.25.
+
+```{r question13b}
+eps = rnorm(100, 0, sqrt(0.25))
+mean(eps)
+var(eps)
+```
+##
+
+c) Using x and eps, generate a vector y according to the model $ Y = −1+0.5X + . (3.39) $ 
+What is the length of the vector y? What are the values of β0 and β1 in this linear model?
+
+```{r question13c}
+y = -1 + 0.5*x + eps
+length(y)
+```
+
+Tamanho de Y = 100
+β0 = -1 
+β1  = 0.5
+
+##
+
+d) Create a scatterplot displaying the relationship between x and y. Comment on what you observe.
+
+```{r question13d}
+plot(x,y)
+```
+
+r: Considerando que os dados foram criados a partir de uma distribuição normal e variança de 0.5, podemos observar a relação linear entre as variáveis.
+
+##
+
+e) Fit a least squares linear model to predict y using x. Comment on the model obtained. How do βˆ0 and βˆ1 compare to β0 and β1?
+
+r:
+```{r question13e}
+reg5 = lm("y ~ x")
+summary(reg5)
+```
+
+Observa-se que o valor estimado para x é similar ao do valor real. Além disso, o valor tem significância estatistica, portanto podemos rejeitar a hipótese nula. 
+##
+
+f) Display the least squares line on the scatterplot obtained in (d). Draw the population regression line on the plot, in a different color. Use the legend() command to create an appropriate legend.
+
+```{r question13f}
+plot(x, y)
+abline(reg5, lwd=3, col='red')
+abline(-1, 0.5, lwd=3, col="blue")
+legend(-1.5, legend = c("Modelo estimado", "Dados reais"), col= c("red","blue"), lwd = 3)
+```
+##
+
+g) Now fit a polynomial regression model that predicts y using x and x2. Is there evidence that the quadratic term improves the model fit? Explain your answer;
+
+```{r question13g}
+reg6 = lm(y~x+I(x^2))
+summary(reg6)
+```
+
+
+r: Comparando o R2 observamos que não houve uma melhora significativa nas estimativas. 
+
+##
+(h) Repeat (a)–(f) after modifying the data generation process in such a way that there is less noise in the data. The model (3.39) should remain the same. You can do this by decreasing the variance of the normal distribution used to generate the error term  in (b). Describe your results.
+
+```{r question13h}
+set.seed(1)
+eps1 = rnorm(100, 0, 0.125)
+x1 = rnorm(100)
+y1 = -1 + 0.5*x1 + eps1
+
+reg7 = lm("y1~x1")
+summary(reg7)
+```
+
+```{r question13h.f}
+plot(x1, y1)
+abline(reg7, lwd=3, col='red')
+abline(-1, 0.5, lwd=3, col="blue")
+legend(-1.5, legend = c("Mod. estimado 2", "Dados reais"), col= c("red","blue"), lwd = 3)
+```
+
+r: Nesse caso, podemos observar o R2 de 0.94, valor superior ao do modelo anterior. Sugerindo que nesse caso, os resultados estão mais próximos do real, e o modelo melhor ajustado. 
+##
+
+i) Repeat (a)–(f) after modifying the data generation process in such a way that there is more noise in the data. The model (3.39) should remain the same. You can do this by increasing
+the variance of the normal distribution used to generate the error term  in (b). Describe your results.
+
+```{r question13i}
+eps2 = rnorm(100, sd=1)
+x2 = rnorm(100)
+y2 = -1 + 0.5*x + eps2
+reg8 <- lm("y2 ~ x2")
+summary(reg8)
+```
+
+```{r question13i.f}
+plot(x2, y2)
+abline(reg8, lwd=3, col='red')
+abline(-1, 0.5, lwd=3, col="blue")
+legend(-3, legend = c("Mod. estimado 3", "Dados reais"), col= c("red","blue"), lwd = 1)
+```
+##
+
+j) What are the confidence intervals for β0 and β1 based on the original data set, the noisier data set, and the less noisy data set? Comment on your results.
+
+r: ?
+
+##
+
+Exercicio 15: 
+This problem involves the Boston data set, which we saw in the lab for this chapter. We will now try to predict per capita crime rate using the other variables in this data set. In other words, per capita crime rate is the response, and the other variables are the predictors.
+
+a)  For each predictor, fit a simple linear regression model to predict the response. Describe your results. In which of the models is there a statistically significant association between the predictor and the response? Create some plots to back up your assertions.
+
+```{r question15a}
+#install.packages("MASS")
+library(MASS)
+data("Boston")
+bd2 = Boston
+summary(bd2)
+names(bd2)
+```
+
+```{r question15a.1, results='asis'}
+# Estimando os modelos
+mod1 = lm("crim ~ zn", data = bd2)
+mod2 = lm("crim ~ indus", data = bd2)
+#Trabalhando chas
+bd2$chas = factor(bd2$chas, levels = c("0", "1"), labels = c("Não", "Sim"))
+mod3 = lm("crim ~ chas", data = bd2)
+mod4 = lm("crim ~ nox", data = bd2)
+mod5 = lm("crim ~ rm", data = bd2)
+mod6 = lm("crim ~ age", data = bd2)
+mod7 = lm("crim ~ dis", data = bd2)
+mod8 = lm("crim ~ rad", data = bd2)
+mod9 = lm("crim ~ tax", data = bd2)
+mod10 = lm("crim ~ ptratio", data = bd2)
+mod11 = lm("crim ~ black", data = bd2)
+mod12 = lm("crim ~ lstat", data = bd2)
+mod13 = lm("crim ~ medv", data = bd2)
+
+texreg::texreg(list(mod1, mod2, mod3, mod4, mod5, mod6, mod7, mod8, mod9,
+                    mod10, mod11, mod12, mod13))
+```
+
+##
+
+(b) Fit a multiple regression model to predict the response using all of the predictors. Describe your results. For which predictors can we reject the null hypothesis H0 : βj = 0?
+
+```{r question15b}
+reg9 = lm("crim ~ zn + indus + chas + nox + rm + age + dis + rad + tax + ptratio + black +
+          lstat + medv", data = bd2)
+summary(reg9)
+```
+
+r: As variáveis "zn", "dis", "rad", "black" e"medv" possuem significância estatística e portanto, podemos rejeitar a hiptése nula. 
+
+##
+
+(c) How do your results from (a) compare to your results from (b)? Create a plot displaying the univariate regression coefficients from (a) on the x-axis, and the multiple regression coefficients from (b) on the y-axis. That is, each predictor is displayed as a single point in the plot. Its coefficient in a simple linear regression model is shown on the x-axis, and its coefficient estimate in the multiple linear regression model is shown on the y-axis
+
+```{r question15c}
+x = c(coefficients(mod1)[2],
+      coefficients(mod2)[2],
+      coefficients(mod3)[2],
+      coefficients(mod4)[2],
+      coefficients(mod5)[2],
+      coefficients(mod6)[2],
+      coefficients(mod7)[2],
+      coefficients(mod8)[2],
+      coefficients(mod9)[2],
+      coefficients(mod10)[2],
+      coefficients(mod11)[2],
+      coefficients(mod12)[2],
+      coefficients(mod13)[2])
+y = coefficients(reg9)[2:14]
+plot(x, y)
+```
+
+r: ?
+
+##
+
+(d) Is there evidence of non-linear association between any of the predictors and the response? To answer this question, for each predictor X, fit a model of the form 
+Y = β0 + β1X + β2X2 + β3X3 + e.
+
+
